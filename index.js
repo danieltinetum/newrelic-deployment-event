@@ -18,10 +18,10 @@ const main = async () => {
     const { payload, ...context } = github.context;
     const branch = context.ref.substring(context.ref.lastIndexOf('/') + 1, context.ref.length);
 
-    
+
     const { data } = await axios(createSearchConfig({
         api_key: core.getInput('api-key'),
-        application_name: core.getInput('application-name')
+        application_name: 'sb'//core.getInput('application-name')
     }));
 
     if (data.applications.length > 1) {
@@ -30,8 +30,9 @@ const main = async () => {
         return;
     }
 
-    const {id, name} = data.applications.shift();
-    console.log(id, name, deployed_at);
+    const { id, name } = data.applications.shift();
+
+
 
 }
 
