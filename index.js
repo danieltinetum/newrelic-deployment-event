@@ -8,8 +8,8 @@ const { createSearchConfig, createEventPostConfig } = require('./newrelic');
 
 const main = async () => {
 
-    console.log(github.context.payload)
-    
+    console.log(github.context)
+
 }
 
 
