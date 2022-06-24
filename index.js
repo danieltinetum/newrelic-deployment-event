@@ -30,9 +30,19 @@ const main = async () => {
         }
     };
 
-    console.log(base)
-    console.log(search)
+    
+    const { data } = await axios(search)
+    
+    if (data.applications.length > 1) {
+        core.setFailed(`The application search returned more than one result, please be more specific or type the full application name.`);
+        process.exit(1);
+        return;
+    }
 
+    const application_id = data.applications[0].id;
+    const nr_app_name = data.applications[0].name;
+
+    console.log( application_id, nr_app_name )
 
 }
 
