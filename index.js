@@ -1,11 +1,11 @@
 
-const core   = require('@actions/core');
-const axios  = require('axios');
+const core = require('@actions/core');
+const axios = require('axios');
 const github = require('@actions/github');
 
-const { createSearchConfig, 
-        createEventPostConfig } = require('./newrelic');
-const { chunk                 } = require('./utils');
+const { createSearchConfig,
+    createEventPostConfig } = require('./newrelic');
+const { chunk } = require('./utils');
 
 
 const main = async () => {
@@ -22,6 +22,8 @@ const main = async () => {
     const { payload, ...context } = github.context;
     const branch = context.ref.substring(context.ref.lastIndexOf('/') + 1, context.ref.length);
 
+
+
     const { data } = await axios(createSearchConfig({
         api_key: core.getInput('api-key'),
         application_name: core.getInput('application-name'),
@@ -34,7 +36,7 @@ const main = async () => {
     }
 
     const { id, name } = data.applications.shift();
-    const remove_pull = payload.commits.filter( c => c.message.indexOf('pull request') === -1 )
+    const remove_pull = payload.commits.filter(c => c.message.indexOf('pull request') === -1)
 
     for (const commits of chunk(remove_pull, PARTITION_SIZE)) {
         const requests = commits.map(commit =>

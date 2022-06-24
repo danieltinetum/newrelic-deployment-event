@@ -2,7 +2,7 @@
 const createSearchConfig = ({application_name, api_key}) => {
     return {
         method: 'get',
-        url: `https://api.newrelic.com/v2/applications.json?filter[name]=${application_name}')}`,
+        url: `https://api.newrelic.com/v2/applications.json?filter[name]=${application_name}`,
         headers: {
             'X-Api-Key': api_key
         }
