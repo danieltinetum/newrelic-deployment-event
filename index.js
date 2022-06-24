@@ -19,10 +19,6 @@ const main = async () => {
     const branch = context.ref.substring(context.ref.lastIndexOf('/') + 1, context.ref.length);
     const remove_pull = payload.commits.filter(c => c.message.indexOf('pull request') === -1);
 
-    console.log(remove_pull);
-    console.log("***********************************");
-    console.log(payload.commits);
-
     const { data } = await axios(createSearchConfig({
         api_key: core.getInput('api-key'),
         application_name: core.getInput('application-name')
@@ -36,7 +32,9 @@ const main = async () => {
 
     const { id, name } = data.applications.shift();
 
-
+    for (const commits of chunk(remove_pull, PARTITION_SIZE)) {
+        console.log(commits.length, "/", payload.commits.length);
+    }
 
 }
 
