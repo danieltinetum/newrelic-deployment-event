@@ -8,21 +8,18 @@ const { createSearchConfig, createEventPostConfig } = require('./newrelic');
 
 const main = async () => {
     const PARTITION_SIZE = 2
+    const PRD_BRANCHES = [
+        'main',
+        'master'
+    ];
 
-    console.log(createSearchConfig({application_name:"Devops",api_key:"ApiKey"}));
-    console.log(createEventPostConfig({
-        account_id:"1234457",
-        insights_insert_key:"EspecialKey",
-        param1:"a",
-        param2:"b"
-    }))
-    
-    const commits = ["A","B","C","D","E","F","G"];
+    const deployed_at = new Date().getTime();
 
-    console.log(chunk(
-        commits, 
-        PARTITION_SIZE
-    ));
+    const { payload, ...context } = github.context;
+    const branch = context.ref.substring(context.ref.lastIndexOf('/') + 1, context.ref.length);
+
+    console.log(deployed_at, branch, context)
+
 }
 
 
