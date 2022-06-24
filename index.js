@@ -3,12 +3,11 @@ const axios = require('axios');
 const github = require('@actions/github');
 
 const { chunk } = require('./utils');
-const { createSearchConfig, 
-        createEventPostConfig } = require('./newrelic');
+const { createSearchConfig, createEventPostConfig } = require('./newrelic');
 
 
 const main = async () => {
-    const PARTITION_SIZE = 2
+    const PARTITION_SIZE = 2;
     const PRD_BRANCHES = [
         'main',
         'master'
