@@ -17,8 +17,10 @@ const main = async () => {
         param2:"b"
     }))
     
+    const commits = ["A","B","C","D","E","F","G"];
+
     console.log(chunk(
-        ["A","B","C","D","E","F"], 
+        commits, 
         PARTITION_SIZE
     ));
 }
