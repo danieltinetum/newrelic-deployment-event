@@ -7,6 +7,7 @@ const { createSearchConfig, createEventPostConfig } = require('./newrelic');
 
 
 const main = async () => {
+    const PARTITION_SIZE = 2
 
     console.log(createSearchConfig({application_name:"Devops",api_key:"ApiKey"}));
     console.log(createEventPostConfig({
@@ -15,7 +16,11 @@ const main = async () => {
         param1:"a",
         param2:"b"
     }))
-
+    
+    console.log(chunk(
+        ["A","B","C","D","E","F"], 
+        PARTITION_SIZE
+    ));
 }
 
 
