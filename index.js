@@ -64,7 +64,10 @@ const main = async () => {
 
         try {
             const response = await Promise.all(requests);
-            core.info(`Result: ${JSON.stringify(response)}`)
+            response.forEach(res => {
+                core.info(`Result: ${JSON.stringify(res.data)}`)
+            })
+            
             successful.push(requests.length);
         } catch (error) {
             errors.push(requests.length);
