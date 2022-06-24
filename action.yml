@@ -1,0 +1,18 @@
+name: 'Deployment Event Registry'
+description: 'Registry time elapsed from push to aplication deplayment'
+inputs:
+  account-id:  # NewRelic Accoun ID
+    description: 'From one.newrelic.com, use the account selector dropdown near the top of the page to switch between accounts and see their IDs.'
+    required: true
+  insights-insert-key: # New Relic Insights Insert Key
+    description: ''
+    required: true
+  api-key:
+    description: 'You can view and manage most API keys from the API keys UI page, which is at one.newrelic.com/launcher/api-keys-ui.api-keys-launcher (from the account dropdown, click API keys).'
+    required: true
+  application-name: # Application Name
+    description: 'Name of the application as it is known in the organization, do not use the repository name.'
+    required: true
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
