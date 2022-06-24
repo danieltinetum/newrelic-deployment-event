@@ -84,7 +84,6 @@ const main = async () => {
         core.setFailed(`Some requests to New Relic were unsuccessful - ${errors.length} / ${configs.length}`);
         process.exit(1);
     }
-
 }
 
 

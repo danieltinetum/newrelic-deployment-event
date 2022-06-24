@@ -13992,7 +13992,7 @@ const main = async () => {
             "appId": application_id,
             "appName": nr_app_name,
             "revision": context.runId,
-            "environment": ['main', 'master'].includes(branch_name) ? "PRD" : "QA",
+            "environment": ['main', 'master'].includes(branch) ? "PRD" : "QA",
             "type": "regular",
             "jobName": context.job,
             "buildNumber": context.runNumber,
@@ -14027,7 +14027,6 @@ const main = async () => {
         core.setFailed(`Some requests to New Relic were unsuccessful - ${errors.length} / ${configs.length}`);
         process.exit(1);
     }
-
 }
 
 
