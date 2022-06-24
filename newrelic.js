@@ -23,6 +23,7 @@ const createEventPostConfig = ({account_id, insights_insert_key, ...params}) => 
     }
 }
 
-module.export = {
-    createSearchConfig
-}
+module.exports = {
+    createSearchConfig,
+    createEventPostConfig
+} 
