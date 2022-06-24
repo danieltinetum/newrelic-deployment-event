@@ -3,7 +3,8 @@ const axios = require('axios');
 const github = require('@actions/github');
 
 const { chunk } = require('./utils');
-const { createSearchConfig, createEventPostConfig } = require('./newrelic');
+const { createSearchConfig, 
+        createEventPostConfig } = require('./newrelic');
 
 
 const main = async () => {
@@ -62,7 +63,8 @@ const main = async () => {
         );
 
         try {
-            await Promise.all(requests);
+            const response = await Promise.all(requests);
+            core.info(`Result: ${JSON.stringify(response)}`)
             successful.push(requests.length);
         } catch (error) {
             errors.push(requests.length);
@@ -71,6 +73,14 @@ const main = async () => {
 
     core.setOutput("successful", successful.reduce((a, b) => a + b, 0));
     core.setOutput("errors", errors.reduce((a, b) => a + b, 0));
+
+    if (errors.length === configs.length) {
+        core.setFailed(`All requests to New Relic were unsuccessful - (${errors.length})`);
+        process.exit(1);
+    } else if (errors.length > 0) {
+        core.setFailed(`Some requests to New Relic were unsuccessful - ${errors.length} / ${configs.length}`);
+        process.exit(1);
+    }
 
 }
 
