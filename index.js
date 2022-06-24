@@ -8,7 +8,7 @@ const { createSearchConfig, createEventPostConfig } = require('./newrelic');
 
 const main = async () => {
 
-    console.log(github.context)
+    console.log(JSON.stringify(github.context))
 
 }
 
