@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "ncc build index.js --license licenses.txt -m"
+    "build": "ncc build index.js --license licenses.txt -m",
+    "prepare": "ncc build index.js --license licenses.txt -m && git add . && git commit -m \"R\"",
+    "publish": "git tag -d v1.1 && git push origin :refs/tags/v1.1 && git push --follow-tags"
   },
   "repository": {
     "type": "git",
