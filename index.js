@@ -18,7 +18,13 @@ const main = async () => {
     const { payload, ...context } = github.context;
     const branch = context.ref.substring(context.ref.lastIndexOf('/') + 1, context.ref.length);
 
-    console.log(deployed_at, branch, context)
+    
+    const { data } = await axios(createSearchConfig({
+        api_key: core.getInput('api-key'),
+        application_name: core.getInput('application-name')
+    }));
+
+    console.log(data)
 
 }
 
