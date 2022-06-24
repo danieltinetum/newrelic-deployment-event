@@ -74,7 +74,6 @@ const main = async () => {
         }
     }
 
-    
     core.setOutput("successful", successful.reduce((a, b) => a + b, 0));
     core.setOutput("errors", errors.reduce((a, b) => a + b, 0));
 
