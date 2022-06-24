@@ -1,6 +1,41 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 7262:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+/* module decorator */ module = __nccwpck_require__.nmd(module);
+
+const createSearchConfig = ({application_name, api_key}) => {
+    return {
+        method: 'get',
+        url: `https://api.newrelic.com/v2/applications.json?filter[name]=${application_name}')}`,
+        headers: {
+            'X-Api-Key': api_key
+        }
+    };
+}
+
+const createEventPostConfig = ({account_id, insights_insert_key, ...params}) => {
+    return {
+        method: 'post',
+        url: `https://insights-collector.newrelic.com/v1/accounts/${account_id}/events`,
+        headers: {
+            'X-Insert-Key': insights_insert_key,
+            'Content-Type': 'application/json'
+        },
+        data: JSON.stringify({
+            params
+        })
+    }
+}
+
+module.export = {
+    createSearchConfig
+}
+
+/***/ }),
+
 /***/ 1607:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -13756,6 +13791,28 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 8117:
+/***/ ((module) => {
+
+
+
+const chunk = (array, chunkSize) => {
+    const chunk_array = [];
+
+    for (i = 0; i < arr.length; i += chunkSize) {
+        chunk_array.push(array.slice(i, i + chunkSize));
+    }
+
+    return chunk_array;
+}
+
+
+module.exports = {
+    chunk
+} 
+
+/***/ }),
+
 /***/ 4284:
 /***/ ((module) => {
 
@@ -13914,8 +13971,8 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
+/******/ 			id: moduleId,
+/******/ 			loaded: false,
 /******/ 			exports: {}
 /******/ 		};
 /******/ 	
@@ -13928,11 +13985,23 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
 /******/ 	
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/node module decorator */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.nmd = (module) => {
+/******/ 			module.paths = [];
+/******/ 			if (!module.children) module.children = [];
+/******/ 			return module;
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
@@ -13941,81 +14010,73 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-const core = __nccwpck_require__(2989);
+
+const core   = __nccwpck_require__(2989);
+const axios  = __nccwpck_require__(2990);
 const github = __nccwpck_require__(4461);
-const axios = __nccwpck_require__(2990)
+
+const { createSearchConfig, 
+        createEventPostConfig } = __nccwpck_require__(7262);
+const { chunk                 } = __nccwpck_require__(8117);
+
 
 const main = async () => {
-
+    const PRD_BRANCHES = [
+        'main',
+        'master'
+    ];
+    const errors = [];
+    const configs = [];
+    const successful = [];
+    const PARTITION_SIZE = 2
     const deployed_at = new Date().getTime();
+
     const { payload, ...context } = github.context;
     const branch = context.ref.substring(context.ref.lastIndexOf('/') + 1, context.ref.length);
 
-    const configs = [];
-    const successful = [];
-    const errors = [];
+    const { data } = await axios(createSearchConfig({
+        api_key: core.getInput('api-key'),
+        application_name: core.getInput('application-name'),
+    }));
 
-    const base = {
-        method: 'post',
-        url: `https://insights-collector.newrelic.com/v1/accounts/${core.getInput('account-id')}/events`,
-        headers: {
-            'X-Insert-Key': core.getInput('insights-insert-key'),
-            'Content-Type': 'application/json'
-        },
-        data: ""
-    };
-
-    const search = {
-        method: 'get',
-        url: `https://api.newrelic.com/v2/applications.json?filter[name]=${core.getInput('application-name')}`,
-        headers: {
-            'X-Api-Key': core.getInput('api-key')
-        }
-    };
-
-    
-    const { data } = await axios(search)
-    
     if (data.applications.length > 1) {
         core.setFailed(`The application search returned more than one result, please be more specific or type the full application name.`);
         process.exit(1);
         return;
     }
 
-    const application_id = data.applications[0].id;
-    const nr_app_name = data.applications[0].name;
+    const { id, name } = data.applications.shift();
 
-    payload.commits.forEach(commit => {
-        const conf = JSON.parse(JSON.stringify(base))
-        conf.data = JSON.stringify({
-            "eventType": "BelDeployment",
-            "appId": application_id,
-            "appName": nr_app_name,
-            "revision": context.runId,
-            "environment": ['main', 'master'].includes(branch) ? "PRD" : "QA",
-            "type": "regular",
-            "jobName": context.job,
-            "buildNumber": context.runNumber,
-            "branchName": branch,
-            "commit": commit.id,
-            "codeCommittedTime": new Date(commit.timestamp).getTime(),
-            "codeDeployedTime": deployed_at,
-            "buildStatus": "SUCESSFULL",
-            "sendFrom": "GithubActions"
-        });
-        configs.push(
-            conf
+    for (const commits of chunk(payload.commits, PARTITION_SIZE)) {
+        const requests = commits.map(commit =>
+            axios(createEventPostConfig({
+                "account_id": core.getInput('account-id'),
+                "insights_insert_key": core.getInput('insights-insert-key'),
+                "eventType": "BelDeployment",
+                "appId": id,
+                "appName": name,
+                "revision": context.runId,
+                "environment": PRD_BRANCHES.includes(branch) ? "PRD" : "QA",
+                "type": "regular",
+                "jobName": context.job,
+                "buildNumber": context.runNumber,
+                "branchName": branch,
+                "commit": commit.id,
+                "codeCommittedTime": new Date(commit.timestamp).getTime(),
+                "codeDeployedTime": deployed_at,
+                "buildStatus": "SUCESSFULL",
+                "sendFrom": "GithubActions"
+            }))
         );
-    })
 
-    for (const item of configs) {
         try {
-            const result = await axios(item)
-            successful.push(result.data ? 1 : 0)
+            await Promise.all(requests)
+            successful.push(requests.length)
         } catch (error) {
-            errors.push(1)
+            errors.push(requests.length)
         }
-    }
+
+    };
 
     core.setOutput("successful", successful.reduce((a, b) => a + b, 0));
     core.setOutput("errors", errors.reduce((a, b) => a + b, 0));
@@ -14023,14 +14084,19 @@ const main = async () => {
     if (errors.length === configs.length) {
         core.setFailed(`All requests to New Relic were unsuccessful - (${errors.length})`);
         process.exit(1);
-    }else if (errors.length > 0){
+    } else if (errors.length > 0) {
         core.setFailed(`Some requests to New Relic were unsuccessful - ${errors.length} / ${configs.length}`);
         process.exit(1);
     }
 }
 
+try {
+    main();
+} catch (error) {
+    core.setFailed(error.message);
+    process.exit(1);
+}
 
-main();
 })();
 
 module.exports = __webpack_exports__;
