@@ -16,7 +16,7 @@ const main = async () => {
     const errors = [];
     const configs = [];
     const successful = [];
-    const PARTITION_SIZE = 2
+    const PARTITION_SIZE = 2;
     const deployed_at = new Date().getTime();
 
     const { payload, ...context } = github.context;
@@ -26,7 +26,7 @@ const main = async () => {
 
     const { data } = await axios(createSearchConfig({
         api_key: core.getInput('api-key'),
-        application_name: core.getInput('application-name'),
+        application_name: core.getInput('application-name')
     }));
 
     if (data.applications.length > 1) {
@@ -62,9 +62,9 @@ const main = async () => {
 
         try {
             await Promise.all(requests)
-            successful.push(requests.length)
+            successful.push(requests.length);
         } catch (error) {
-            errors.push(requests.length)
+            errors.push(requests.length);
         }
 
     };
