@@ -17,9 +17,11 @@ const main = async () => {
 
     const { payload, ...context } = github.context;
     const branch = context.ref.substring(context.ref.lastIndexOf('/') + 1, context.ref.length);
-    const remove_pull = payload.commits.filter(c => c.message.indexOf('pull request') === -1)
+    const remove_pull = payload.commits.filter(c => c.message.indexOf('pull request') === -1);
 
-    console.log( remove_pull )
+    console.log(remove_pull);
+    console.log("***********************************");
+    console.log(payload.commits);
 
     const { data } = await axios(createSearchConfig({
         api_key: core.getInput('api-key'),
